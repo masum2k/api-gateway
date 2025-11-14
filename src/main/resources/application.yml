@@ -6,27 +6,50 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-      routes:
-        - id: auth-service-route
-          uri: lb://auth-service
-          predicates:
-            - Path=/api/auth/**
-        - id: todo-api-route
-          uri: lb://todo-api-project
-          predicates:
-            - Path=/api/todos/**
-        - id: weather-api-route
-          uri: lb://todo-api-project
-          predicates:
-            - Path=/api/weather/**
 
+      # 1. DISCOVERY LOCATOR (DOĞRU YERDE)
+      # 2. ROUTES (DOĞRU YERDE)
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: auth-service-route
+              uri: lb://auth-service
+              predicates:
+                        - Path=/api/auth/**
+
+            - id: todo-api-route
+              uri: lb://todo-api-project
+              predicates:
+                        - Path=/api/todos/**
+
+            - id: weather-api-route
+              uri: lb://todo-api-project
+              predicates:
+                        - Path=/api/weather/**
+
+# EUREKA AYARLARI
 eureka:
   client:
     service-url:
       defaultZone: http://eureka-server:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+    registry-fetch-interval-seconds: 5
+  instance:
+    # Bu ayarlar docker-compose'dan geliyor, buradan silmek daha temiz olur.
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+# Actuator (Health check için)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
