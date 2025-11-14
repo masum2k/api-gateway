@@ -1,0 +1,32 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: auth-service-route
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+        - id: todo-api-route
+          uri: lb://todo-api-project
+          predicates:
+            - Path=/api/todos/**
+        - id: weather-api-route
+          uri: lb://todo-api-project
+          predicates:
+            - Path=/api/weather/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
